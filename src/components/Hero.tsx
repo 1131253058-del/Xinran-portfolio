@@ -1,7 +1,31 @@
-import { motion } from "motion/react";
-import { Mail, FolderOpen } from "lucide-react";
+import { useState } from "react";
+import { motion, AnimatePresence } from "motion/react";
+import { Mail, FolderOpen, X, Phone, MessageCircle, Copy, Check } from "lucide-react";
 
-export default function Hero() {
+interface HeroProps {
+  onScrollToPortfolio?: () => void;
+}
+
+export default function Hero({ onScrollToPortfolio }: HeroProps) {
+  const [showContact, setShowContact] = useState(false);
+  const [copiedPhone, setCopiedPhone] = useState(false);
+  const [copiedWechat, setCopiedWechat] = useState(false);
+
+  const copyToClipboard = async (text: string, type: 'phone' | 'wechat') => {
+    try {
+      await navigator.clipboard.writeText(text);
+      if (type === 'phone') {
+        setCopiedPhone(true);
+        setTimeout(() => setCopiedPhone(false), 2000);
+      } else {
+        setCopiedWechat(true);
+        setTimeout(() => setCopiedWechat(false), 2000);
+      }
+    } catch (err) {
+      console.error('Failed to copy:', err);
+    }
+  };
+
   return (
     <section className="pt-40 pb-20 px-6 max-w-7xl mx-auto flex flex-col lg:flex-row items-center gap-12">
       <div className="flex-1 space-y-8">
@@ -20,10 +44,16 @@ export default function Hero() {
         </p>
         
         <div className="flex flex-wrap gap-4">
-          <button className="brutal-btn-black">
+          <button 
+            className="brutal-btn-black"
+            onClick={() => setShowContact(true)}
+          >
             <Mail size={20} /> 联系我
           </button>
-          <button className="brutal-btn-white">
+          <button 
+            className="brutal-btn-white"
+            onClick={onScrollToPortfolio}
+          >
             <FolderOpen size={20} /> 查看作品
           </button>
         </div>
@@ -44,6 +74,70 @@ export default function Hero() {
           <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-4xl">💖</div>
         </div>
       </motion.div>
+
+      <AnimatePresence>
+        {showContact && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+            onClick={() => setShowContact(false)}
+          >
+            <motion.div 
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.8, opacity: 0 }}
+              className="bg-white border-4 border-black rounded-3xl p-8 max-w-sm w-full mx-4 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)]"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-2xl font-black">联系我</h3>
+                <button 
+                  onClick={() => setShowContact(false)}
+                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                >
+                  <X size={24} />
+                </button>
+              </div>
+              
+              <div className="space-y-4">
+                <div className="flex items-center gap-4 p-4 bg-gray-50 border-2 border-black rounded-xl">
+                  <div className="w-12 h-12 bg-brand-blue text-white rounded-full flex items-center justify-center">
+                    <Phone size={20} />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm text-gray-500 font-medium">手机号</p>
+                    <p className="text-lg font-bold">17862932858</p>
+                  </div>
+                  <button 
+                    onClick={() => copyToClipboard('17862932858', 'phone')}
+                    className="p-2 hover:bg-gray-200 rounded-lg transition-colors"
+                  >
+                    {copiedPhone ? <Check size={20} className="text-green-500" /> : <Copy size={20} />}
+                  </button>
+                </div>
+                
+                <div className="flex items-center gap-4 p-4 bg-gray-50 border-2 border-black rounded-xl">
+                  <div className="w-12 h-12 bg-brand-pink text-white rounded-full flex items-center justify-center">
+                    <MessageCircle size={20} />
+                  </div>
+                  <div className="flex-1">
+                    <p className="text-sm text-gray-500 font-medium">微信</p>
+                    <p className="text-lg font-bold">UNICORN-C</p>
+                  </div>
+                  <button 
+                    onClick={() => copyToClipboard('UNICORN-C', 'wechat')}
+                    className="p-2 hover:bg-gray-200 rounded-lg transition-colors"
+                  >
+                    {copiedWechat ? <Check size={20} className="text-green-500" /> : <Copy size={20} />}
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </section>
   );
 }

@@ -11,6 +11,13 @@ import Portfolio from "./components/Portfolio";
 export default function App() {
   const [activeTab, setActiveTab] = useState('home');
 
+  const scrollToPortfolio = () => {
+    const portfolioSection = document.getElementById('portfolio');
+    if (portfolioSection) {
+      portfolioSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   return (
     <div className="min-h-screen selection:bg-brand-pink selection:text-white">
       <Navbar activeTab={activeTab} setActiveTab={setActiveTab} />
@@ -25,7 +32,10 @@ export default function App() {
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
             >
-              <Hero />
+              <Hero onScrollToPortfolio={scrollToPortfolio} />
+              <div id="portfolio">
+                <Portfolio />
+              </div>
               <AboutSection />
               <Testimonials />
               <Articles />
