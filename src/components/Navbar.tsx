@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { motion, AnimatePresence } from "motion/react";
-import { FileText, X, Lock } from "lucide-react";
+import { motion } from "motion/react";
+import { FileText, Lock } from "lucide-react";
+import Modal from "./Modal";
 
 interface NavbarProps {
   activeTab: string;
@@ -29,6 +30,34 @@ export default function Navbar({ activeTab, setActiveTab }: NavbarProps) {
     }
   };
 
+  const handleClose = () => {
+    setShowPasswordModal(false);
+    setPassword("");
+    setError(false);
+  };
+
+  const handleTabClick = (tabId: string) => {
+    setActiveTab(tabId);
+    
+    if (tabId === 'home') {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    } else if (tabId === 'about') {
+      setTimeout(() => {
+        const aboutSection = document.getElementById('about');
+        if (aboutSection) {
+          aboutSection.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 100);
+    } else if (tabId === 'portfolio') {
+      setTimeout(() => {
+        const portfolioSection = document.getElementById('portfolio');
+        if (portfolioSection) {
+          portfolioSection.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 100);
+    }
+  };
+
   const tabs = [
     { id: 'home', label: '首页' },
     { id: 'about', label: '关于我' },
@@ -49,7 +78,7 @@ export default function Navbar({ activeTab, setActiveTab }: NavbarProps) {
             {tabs.map((tab) => (
               <button
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
+                onClick={() => handleTabClick(tab.id)}
                 className={`text-lg font-bold transition-colors hover:text-brand-pink ${
                   activeTab === tab.id ? 'text-brand-pink' : 'text-black'
                 }`}
@@ -68,77 +97,55 @@ export default function Navbar({ activeTab, setActiveTab }: NavbarProps) {
         </div>
       </nav>
 
-      <AnimatePresence>
-        {showPasswordModal && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
-            onClick={() => {
-              setShowPasswordModal(false);
-              setPassword("");
-              setError(false);
-            }}
+      <Modal
+        isOpen={showPasswordModal}
+        onClose={handleClose}
+        className="bg-white border-4 border-black rounded-3xl p-8 max-w-sm w-full mx-4 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)]"
+      >
+        <div className="flex justify-between items-center mb-6">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-brand-black text-white rounded-full flex items-center justify-center">
+              <Lock size={20} />
+            </div>
+            <h3 className="text-xl font-black">查看简历</h3>
+          </div>
+          <button 
+            onClick={handleClose}
+            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
           >
-            <motion.div 
-              initial={{ scale: 0.8, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.8, opacity: 0 }}
-              className="bg-white border-4 border-black rounded-3xl p-8 max-w-sm w-full mx-4 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)]"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <div className="flex justify-between items-center mb-6">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 bg-brand-black text-white rounded-full flex items-center justify-center">
-                    <Lock size={20} />
-                  </div>
-                  <h3 className="text-xl font-black">查看简历</h3>
-                </div>
-                <button 
-                  onClick={() => {
-                    setShowPasswordModal(false);
-                    setPassword("");
-                    setError(false);
-                  }}
-                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-                >
-                  <X size={24} />
-                </button>
-              </div>
-              
-              <p className="text-gray-500 mb-4">请输入密码访问简历</p>
-              
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => {
-                  setPassword(e.target.value);
-                  setError(false);
-                }}
-                onKeyPress={handleKeyPress}
-                placeholder="请输入密码"
-                className={`w-full px-4 py-3 border-2 rounded-xl font-medium focus:outline-none focus:ring-2 ${
-                  error 
-                    ? "border-red-500 focus:ring-red-200" 
-                    : "border-black focus:ring-gray-200"
-                }`}
-              />
-              
-              {error && (
-                <p className="text-red-500 text-sm mt-2">密码错误，请重试</p>
-              )}
-              
-              <button
-                onClick={handleSubmit}
-                className="w-full mt-4 bg-black text-white py-3 rounded-xl font-bold hover:scale-[1.02] transition-transform"
-              >
-                确认
-              </button>
-            </motion.div>
-          </motion.div>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+          </button>
+        </div>
+        
+        <p className="text-gray-500 mb-4">请输入密码访问简历</p>
+        
+        <input
+          type="password"
+          value={password}
+          onChange={(e) => {
+            setPassword(e.target.value);
+            setError(false);
+          }}
+          onKeyPress={handleKeyPress}
+          placeholder="请输入密码"
+          className={`w-full px-4 py-3 border-2 rounded-xl font-medium focus:outline-none focus:ring-2 ${
+            error 
+              ? "border-red-500 focus:ring-red-200" 
+              : "border-black focus:ring-gray-200"
+          }`}
+        />
+        
+        {error && (
+          <p className="text-red-500 text-sm mt-2">密码错误，请重试</p>
         )}
-      </AnimatePresence>
+        
+        <button
+          onClick={handleSubmit}
+          className="w-full mt-4 bg-black text-white py-3 rounded-xl font-bold hover:scale-[1.02] transition-transform"
+        >
+          确认
+        </button>
+      </Modal>
     </>
   );
 }

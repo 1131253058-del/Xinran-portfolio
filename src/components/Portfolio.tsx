@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { Sparkles, Briefcase, Heart, GraduationCap, Star, Cat, Palmtree, X, ChevronLeft, ChevronRight } from "lucide-react";
+import { Sparkles, Briefcase, Heart, GraduationCap, Star, Cat, Palmtree, ChevronLeft, ChevronRight } from "lucide-react";
+import Modal from "./Modal";
 
 const timeline = [
   { year: "未来", content: "未完待续…", icon: Sparkles, type: "main" },
@@ -11,7 +12,7 @@ const timeline = [
   { year: "2023年9月", content: "养了第一只加菲猫，脸脸", icon: Cat, type: "side" },
   { year: "2022年1月", content: "在网易上班了，开始了漫长的牛马生涯", icon: Briefcase, type: "main" },
   { year: "2021年12月", content: "英国布里斯托大学硕士毕业，社会学赐予我灵魂", icon: GraduationCap, type: "main" },
-  { year: "2020年6月", content: "山东女子学院本科毕业，我为女院代言", icon: GraduationCap, type: "main" },
+  { year: "2020年6月", content: "本科毕业，社会工作专业浇灌我成了ESFJ", icon: GraduationCap, type: "main" },
   { year: "1996年11月", content: "出生，一枚腹黑的天蝎座", icon: Star, type: "main" }
 ];
 
@@ -38,10 +39,16 @@ export default function Portfolio() {
     <section className="pt-20 pb-20 px-6 max-w-7xl mx-auto space-y-16">
       <div className="text-center space-y-4">
         <h2 className="text-6xl font-black">关于<span className="highlight-pink">我</span></h2>
-        <div className="text-xl font-medium max-w-2xl mx-auto leading-relaxed">
-          <span className="text-gray-600">循规蹈矩的人生里，</span>
-          <span className="text-brand-pink font-bold">掺杂着些些叛逆</span>
-          <span className="text-gray-600">...</span>
+        <div className="text-xl font-medium max-w-2xl mx-auto leading-relaxed space-y-1">
+          <div>
+            <span className="text-gray-600">循规蹈矩的人生里，</span>
+            <span className="text-brand-pink font-bold">掺杂着些些叛逆</span>
+            <span className="text-gray-600">...</span>
+          </div>
+          <div>
+            <span className="text-gray-600">ESFJ的主基调里，</span>
+            <span className="text-brand-blue font-bold">时不时会迸发INTJ</span>
+          </div>
         </div>
       </div>
 
@@ -123,78 +130,65 @@ export default function Portfolio() {
         </div>
       </div>
 
-      <AnimatePresence>
-        {showImages && (
-          <motion.div 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/90 flex items-center justify-center z-50 p-8"
-            onClick={() => setShowImages(false)}
-          >
-            <motion.div 
-              initial={{ scale: 0.8 }}
-              animate={{ scale: 1 }}
-              exit={{ scale: 0.8 }}
-              className="relative max-w-4xl w-full"
-              onClick={(e) => e.stopPropagation()}
+      <Modal
+        isOpen={showImages}
+        onClose={() => setShowImages(false)}
+        backdropClassName="bg-black/90"
+        className="relative max-w-4xl w-full p-8"
+      >
+        <button 
+          onClick={() => setShowImages(false)}
+          className="absolute -top-12 right-0 text-white hover:scale-110 transition-transform"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </button>
+        
+        <div className="flex items-center justify-center gap-4 group">
+          {selectedImages.length > 1 && (
+            <button 
+              onClick={prevImage}
+              className="absolute left-4 text-white hover:scale-110 transition-transform opacity-0 group-hover:opacity-100"
             >
-              <button 
-                onClick={() => setShowImages(false)}
-                className="absolute -top-12 right-0 text-white hover:scale-110 transition-transform"
-              >
-                <X size={40} />
-              </button>
-              
-              <div className="flex items-center justify-center gap-4 group">
-                {selectedImages.length > 1 && (
-                  <button 
-                    onClick={prevImage}
-                    className="absolute left-4 text-white hover:scale-110 transition-transform opacity-0 group-hover:opacity-100"
-                  >
-                    <ChevronLeft size={48} />
-                  </button>
-                )}
-                
-                <AnimatePresence mode="wait">
-                  <motion.img 
-                    key={currentIndex}
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -20 }}
-                    src={`/${selectedImages[currentIndex]}`}
-                    alt={selectedImages[currentIndex]}
-                    className="w-full max-h-[70vh] object-contain border-4 border-white rounded-xl"
-                  />
-                </AnimatePresence>
-                
-                {selectedImages.length > 1 && (
-                  <button 
-                    onClick={nextImage}
-                    className="absolute right-4 text-white hover:scale-110 transition-transform opacity-0 group-hover:opacity-100"
-                  >
-                    <ChevronRight size={48} />
-                  </button>
-                )}
-              </div>
-              
-              {selectedImages.length > 1 && (
-                <div className="flex justify-center gap-2 mt-4">
-                  {selectedImages.map((_, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => setCurrentIndex(idx)}
-                      className={`w-3 h-3 rounded-full transition-colors ${
-                        idx === currentIndex ? 'bg-white' : 'bg-gray-500'
-                      }`}
-                    />
-                  ))}
-                </div>
-              )}
-            </motion.div>
-          </motion.div>
+              <ChevronLeft size={48} />
+            </button>
+          )}
+          
+          <AnimatePresence mode="wait">
+            <motion.img 
+              key={currentIndex}
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              src={`/${selectedImages[currentIndex]}`}
+              alt={selectedImages[currentIndex]}
+              className="w-full max-h-[70vh] object-contain border-4 border-white rounded-xl"
+            />
+          </AnimatePresence>
+          
+          {selectedImages.length > 1 && (
+            <button 
+              onClick={nextImage}
+              className="absolute right-4 text-white hover:scale-110 transition-transform opacity-0 group-hover:opacity-100"
+            >
+              <ChevronRight size={48} />
+            </button>
+          )}
+        </div>
+        
+        {selectedImages.length > 1 && (
+          <div className="flex justify-center gap-2 mt-4">
+            {selectedImages.map((_, idx) => (
+              <button
+                key={idx}
+                onClick={() => setCurrentIndex(idx)}
+                className={`w-3 h-3 rounded-full transition-colors ${
+                  idx === currentIndex ? 'bg-white' : 'bg-gray-500'
+                }`}
+              />
+            ))}
+          </div>
         )}
-      </AnimatePresence>
+      </Modal>
     </section>
   );
 }
